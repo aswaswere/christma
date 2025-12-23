@@ -730,25 +730,25 @@ export default function ChristmasTree() {
     <div className="relative w-full h-screen overflow-hidden">
       <div ref={mountRef} className="w-full h-full" />
       
-      <div className="absolute top-0 left-0 right-0 p-6 text-center">
-        <h1 className="text-5xl font-bold text-white mb-2" style={{ textShadow: '0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.5)' }}>
+      <div className="absolute top-0 left-0 right-0 p-2 sm:p-6 text-center">
+        <h1 className="text-sm sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight px-1" style={{ textShadow: '0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.5)' }}>
           🎄 Old Toons Wishes You A Very Merry Christmas 🎄
         </h1>
       </div>
 
-      <div className="absolute top-32 right-6 w-96">
-        <div className="flex gap-2">
+      <div className="absolute top-12 sm:top-24 md:top-32 left-2 right-2 sm:left-auto sm:right-6 sm:w-96">
+        <div className="flex gap-1 sm:gap-2">
           <input
             type="text"
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Search for a name..."
-            className="flex-1 px-4 py-3 rounded-lg text-lg bg-white/90 backdrop-blur-sm border-2 border-yellow-400 focus:outline-none focus:border-yellow-500"
+            placeholder="Search..."
+            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-3 rounded text-xs sm:text-lg bg-white/90 backdrop-blur-sm border-2 border-yellow-400 focus:outline-none focus:border-yellow-500"
           />
           <button
             onClick={handleSearch}
-            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
+            className="px-3 sm:px-6 py-1.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded font-semibold transition-colors text-xs sm:text-base"
           >
             🔍
           </button>
@@ -756,7 +756,7 @@ export default function ChristmasTree() {
       </div>
 
       {foundName && (
-        <div className="absolute top-48 right-6 bg-green-600 text-white px-8 py-4 rounded-lg text-xl font-bold animate-pulse">
+        <div className="absolute top-20 sm:top-40 md:top-48 left-2 right-2 sm:left-auto sm:right-6 sm:max-w-md bg-green-600 text-white px-3 sm:px-8 py-2 sm:py-4 rounded text-sm sm:text-xl font-bold animate-pulse text-center">
           🎉 Found: {foundName} 🎉
         </div>
       )}
