@@ -47,12 +47,12 @@ export default function ChristmasTree() {
     rendererRef.current = renderer;
     mountRef.current.appendChild(renderer.domElement);
 
-    // Ambient light for overall scene illumination
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // Ambient light for overall scene illumination - brighter
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
 
-    // Main spotlight from above (like room light)
-    const spotLight = new THREE.SpotLight(0xffffff, 1.2);
+    // Main spotlight from above (like room light) - brighter
+    const spotLight = new THREE.SpotLight(0xffffff, 1.8);
     spotLight.position.set(0, 10, 5);
     spotLight.angle = Math.PI / 4;
     spotLight.penumbra = 0.5;
@@ -63,18 +63,18 @@ export default function ChristmasTree() {
     spotLight.shadow.mapSize.height = 2048;
     scene.add(spotLight);
 
-    // Warm point light from the side (like fireplace glow)
-    const pointLight1 = new THREE.PointLight(0xffaa66, 0.8, 15);
+    // Warm point light from the side (like fireplace glow) - brighter
+    const pointLight1 = new THREE.PointLight(0xffaa66, 1.2, 15);
     pointLight1.position.set(-5, 3, -5);
     scene.add(pointLight1);
 
-    // Cool point light from other side for depth
-    const pointLight2 = new THREE.PointLight(0x6699ff, 0.6, 15);
+    // Cool point light from other side for depth - brighter
+    const pointLight2 = new THREE.PointLight(0x6699ff, 1.0, 15);
     pointLight2.position.set(5, 4, -3);
     scene.add(pointLight2);
 
-    // Soft fill light from front
-    const fillLight = new THREE.PointLight(0xffffff, 0.5, 20);
+    // Soft fill light from front - brighter
+    const fillLight = new THREE.PointLight(0xffffff, 0.9, 20);
     fillLight.position.set(0, 2, 10);
     scene.add(fillLight);
 
@@ -109,9 +109,9 @@ export default function ChristmasTree() {
 
         const geometry = new THREE.ConeGeometry(radius, coneHeight, segments);
 
-        // Gradient color blending: lighter, more vibrant greens
-        const baseGreen = new THREE.Color(0x2d6b3f); // Medium forest green
-        const topGreen = new THREE.Color(0x4a9d5f);  // Brighter green
+        // Gradient color blending: much brighter, more vibrant greens
+        const baseGreen = new THREE.Color(0x4a9d5f); // Brighter forest green
+        const topGreen = new THREE.Color(0x5cbd73);  // Even brighter green
         const blendedColor = baseGreen.clone().lerp(topGreen, progress);
 
         // Add tiny random variation to break banding
@@ -123,10 +123,10 @@ export default function ChristmasTree() {
 
         const material = new THREE.MeshPhongMaterial({
           color: blendedColor,
-          shininess: 12,
+          shininess: 20,
           flatShading: false,
           emissive: blendedColor,
-          emissiveIntensity: 0.08 * lightFalloff // Slightly brighter emissive
+          emissiveIntensity: 0.15 * lightFalloff // Much brighter emissive
         });
 
         const cone = new THREE.Mesh(geometry, material);
@@ -731,12 +731,12 @@ export default function ChristmasTree() {
       <div ref={mountRef} className="w-full h-full" />
       
       <div className="absolute top-0 left-0 right-0 p-2 sm:p-6 text-center">
-        <h1 className="text-sm sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight px-1" style={{ textShadow: '0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.5)' }}>
+        <h1 className="text-sm sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight px-1" style={{ textShadow: '0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.5)' }}>
           🎄 Old Toons Wishes You A Very Merry Christmas 🎄
         </h1>
       </div>
 
-      <div className="absolute top-12 sm:top-24 md:top-32 left-2 right-2 sm:left-auto sm:right-6 sm:w-96">
+      <div className="absolute top-12 sm:top-24 md:top-32 left-2 right-2 sm:left-auto sm:right-6 sm:w-72">
         <div className="flex gap-1 sm:gap-2">
           <input
             type="text"
