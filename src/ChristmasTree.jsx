@@ -163,25 +163,32 @@ export default function ChristmasTree() {
   const [zoomTransform, setZoomTransform] = useState({ scale: 1, x: 0, y: 0 });
   const treeRef = useRef(null);
 
-  // Generate FIXED positions for names - use index as seed for consistent placement
+  // Generate FIXED positions for names - ONLY on green foliage tiers
   const namePositions = names.map((name, index) => {
-    // Tree SVG coordinates: top at y=18, bottom at y=80
-    // We'll distribute names from y=28 to y=75 (within visible tree area)
-    const yPercent = 28 + (index / names.length) * 47; // 28% to 75% height
+    // Define the 5 tree tiers with their actual green foliage boundaries
+    const tiers = [
+      { yStart: 20, yEnd: 28, xMin: 38, xMax: 62 },   // Top tier
+      { yStart: 28, yEnd: 38, xMin: 33, xMax: 67 },   // Second tier
+      { yStart: 38, yEnd: 50, xMin: 28, xMax: 72 },   // Third tier
+      { yStart: 50, yEnd: 65, xMin: 23, xMax: 77 },   // Fourth tier
+      { yStart: 65, yEnd: 78, xMin: 18, xMax: 82 },   // Bottom tier
+    ];
 
-    // Calculate tree width at this height based on actual SVG polygon points
-    // Tree shape: y=18->width=24, y=28->width=26, y=38->width=36, y=50->width=46, y=65->width=56, y=80->width=64
-    // Using linear interpolation between tiers
-    const normalizedY = (yPercent - 28) / 47; // 0 to 1
+    // Distribute names across tiers
+    const tierIndex = Math.floor((index / names.length) * tiers.length);
+    const tier = tiers[Math.min(tierIndex, tiers.length - 1)];
 
-    // Much tighter bounds - tree width from center
-    // At y=28 (top): ~13 units from center (26/2)
-    // At y=75 (bottom): ~30 units from center (60/2)
-    const treeWidthAtY = 6 + normalizedY * 18; // 6 to 24 units from center (very conservative)
+    // Position within this specific tier using stable pseudo-random
+    const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2;
+    const pseudoRandom2 = (Math.sin(index * 78.233) + 1) / 2;
 
-    // Use index-based pseudo-random for stable positions
-    const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2; // 0 to 1, stable per index
-    const xPercent = 50 + (pseudoRandom - 0.5) * (treeWidthAtY * 0.55); // 0.55 multiplier for extra safety
+    // Y position within the tier's green area
+    const yPercent = tier.yStart + pseudoRandom2 * (tier.yEnd - tier.yStart);
+
+    // X position within the tier's width (with safety margin)
+    const tierWidth = tier.xMax - tier.xMin;
+    const safetyMargin = tierWidth * 0.15; // 15% margin from edges
+    const xPercent = tier.xMin + safetyMargin + pseudoRandom * (tierWidth - 2 * safetyMargin);
 
     return {
       name,
