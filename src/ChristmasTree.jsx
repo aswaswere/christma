@@ -33,6 +33,7 @@ export default function ChristmasTree() {
   const [searchName, setSearchName] = useState('');
   const [foundName, setFoundName] = useState(null);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [displayedName, setDisplayedName] = useState(null); // For HTML overlay
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
@@ -698,6 +699,9 @@ export default function ChristmasTree() {
     const startPos = camera.position.clone();
     const defaultPos = new THREE.Vector3(0, 3, 8);
 
+    // Clear displayed name
+    setDisplayedName(null);
+
     // Reset all materials
     treeObjectsRef.current.forEach(obj => {
       if (obj.material) {
@@ -710,12 +714,13 @@ export default function ChristmasTree() {
       ornament.material.opacity = 1;
       ornament.material.depthTest = true;
       ornament.material.depthWrite = true;
-      // Reset name sprite opacity, texture, and rendering order to default
+      // Reset name sprite
       if (ornament.sprite && ornament.sprite.material) {
-        ornament.sprite.material.opacity = 0.2; // Back to default subtle visibility
-        ornament.sprite.renderOrder = 999; // Back to default render order
-        ornament.sprite.material.depthTest = false; // Back to default
+        ornament.sprite.material.opacity = 0.2;
+        ornament.sprite.renderOrder = 999;
+        ornament.sprite.material.depthTest = false;
         ornament.sprite.material.depthWrite = false;
+        ornament.sprite.scale.set(0.3, 0.15, 1);
         if (ornament.originalTexture) {
           ornament.sprite.material.map = ornament.originalTexture;
           ornament.sprite.material.needsUpdate = true;
@@ -723,10 +728,10 @@ export default function ChristmasTree() {
       }
     });
 
-    // Animate back to default view using requestAnimationFrame for smoother performance
+    // Animate back to default view
     let progress = 0;
     const animateReset = () => {
-      progress += 0.02; // Slightly faster for quicker return
+      progress += 0.02;
 
       if (progress >= 1) {
         progress = 1;
@@ -741,7 +746,6 @@ export default function ChristmasTree() {
       camera.position.lerpVectors(startPos, defaultPos, easeProgress);
       camera.lookAt(0, 2, 0);
 
-      // Continue animation if not finished
       if (progress < 1) {
         requestAnimationFrame(animateReset);
       }
@@ -750,16 +754,16 @@ export default function ChristmasTree() {
   };
 
   const handleSearch = () => {
-    // Check if name exists in the list
     const nameExists = names.find(name => name.toLowerCase() === searchName.toLowerCase());
 
     if (nameExists) {
       setFoundName(nameExists);
       setIsZoomed(true);
+      setDisplayedName(nameExists); // Show HTML overlay
 
-      // Generate random position on the tree
+      // Generate random position
       const randomAngle = Math.random() * Math.PI * 2;
-      const randomHeightProgress = 0.2 + Math.random() * 0.6; // Between 20% and 80% height
+      const randomHeightProgress = 0.2 + Math.random() * 0.6;
       const randomHeight = randomHeightProgress * 5.5;
 
       const baseRadius = 1.9;
@@ -769,11 +773,10 @@ export default function ChristmasTree() {
       const x = Math.cos(randomAngle) * radius;
       const z = Math.sin(randomAngle) * radius;
 
-      // Create or update the ornament at this random position
       let found = ornamentsRef.current.find(orn => orn.name === nameExists);
 
       if (found) {
-        // Update position of existing ornament
+        // Update ornament position
         found.mesh.position.set(x, randomHeight, z);
         found.sprite.position.set(x, randomHeight - 0.32, z);
         if (found.string) treeGroupRef.current.remove(found.string);
@@ -782,18 +785,14 @@ export default function ChristmasTree() {
         found.angle = randomAngle;
         found.position = new THREE.Vector3(x, randomHeight, z);
 
-        // Recreate hanging elements at new position
+        // Recreate hanging elements
         const branchRadius = radius * 0.85;
         const branchX = Math.cos(randomAngle) * branchRadius;
         const branchZ = Math.sin(randomAngle) * branchRadius;
         const branchY = randomHeight + 0.3;
 
         const hookGeometry = new THREE.SphereGeometry(0.02, 8, 8);
-        const hookMaterial = new THREE.MeshPhongMaterial({
-          color: 0xd4af37,
-          shininess: 60,
-          metalness: 0.7
-        });
+        const hookMaterial = new THREE.MeshPhongMaterial({ color: 0xd4af37, shininess: 60, metalness: 0.7 });
         const hook = new THREE.Mesh(hookGeometry, hookMaterial);
         hook.position.set(branchX, branchY, branchZ);
         treeGroupRef.current.add(hook);
@@ -819,7 +818,7 @@ export default function ChristmasTree() {
         found.cap = cap;
       }
 
-      // Dim down tree and other ornaments significantly
+      // Dim everything
       treeObjectsRef.current.forEach(obj => {
         if (obj.material) {
           obj.material.transparent = true;
@@ -827,120 +826,37 @@ export default function ChristmasTree() {
         }
       });
 
-      // Dim down all ornaments and make other names nearly invisible
       ornamentsRef.current.forEach(ornament => {
         ornament.material.emissive.setHex(0x000000);
         ornament.material.transparent = true;
         ornament.material.opacity = 0.3;
-        ornament.material.depthTest = true;
-        ornament.material.depthWrite = true;
         if (ornament.sprite && ornament.sprite.material) {
           ornament.sprite.material.opacity = 0.02;
-          ornament.sprite.renderOrder = -5;
-          ornament.sprite.material.depthTest = true;
-          ornament.sprite.material.depthWrite = false;
         }
       });
 
-      // Highlight the found ornament brightly
+      // Highlight found ornament
       found.material.emissive.setHex(0xffdd00);
       found.material.emissiveIntensity = 1.2;
       found.material.opacity = 1;
-      found.material.depthTest = false;
-      found.material.depthWrite = false;
 
-      // Create highlighted name with white box - high resolution
-      if (found.sprite) {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        // High resolution for crystal clear text
-        canvas.width = 2048;
-        canvas.height = 512;
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        let fontSize = 140; // Scaled for high-res
-        context.font = `Bold ${fontSize}px Georgia, serif`;
-        let textWidth = context.measureText(found.name).width;
-
-        const maxWidth = canvas.width - 400; // More padding for white box
-        while (textWidth > maxWidth && fontSize > 60) {
-          fontSize -= 4;
-          context.font = `Bold ${fontSize}px Georgia, serif`;
-          textWidth = context.measureText(found.name).width;
-        }
-
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-
-        // Draw white background box (scaled for high-res)
-        const padding = 80;
-        const boxWidth = textWidth + padding * 2;
-        const boxHeight = fontSize + padding;
-        const boxX = (canvas.width - boxWidth) / 2;
-        const boxY = (canvas.height - boxHeight) / 2;
-
-        context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        context.shadowBlur = 30;
-        context.shadowOffsetX = 0;
-        context.shadowOffsetY = 10;
-        context.fillStyle = '#FFFFFF';
-        context.fillRect(boxX, boxY, boxWidth, boxHeight);
-
-        context.shadowColor = 'rgba(0, 0, 0, 0)';
-        context.shadowBlur = 0;
-
-        // Very thick black outline (scaled for high-res)
-        context.strokeStyle = '#000000';
-        context.lineWidth = 48;
-        context.strokeText(found.name, canvas.width / 2, canvas.height / 2);
-
-        // White outline (scaled for high-res)
-        context.strokeStyle = '#ffffff';
-        context.lineWidth = 12;
-        context.strokeText(found.name, canvas.width / 2, canvas.height / 2);
-
-        // Bright gold fill
-        context.fillStyle = '#FFD700';
-        context.fillText(found.name, canvas.width / 2, canvas.height / 2);
-
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.minFilter = THREE.LinearFilter; // Better quality
-        texture.magFilter = THREE.LinearFilter;
-        found.sprite.material.map = texture;
-        found.sprite.material.opacity = 1.0;
-        found.sprite.material.depthTest = false;
-        found.sprite.material.depthWrite = false;
-        found.sprite.renderOrder = 1000;
-        found.sprite.material.needsUpdate = true;
-
-        // Make the sprite MUCH larger when searched - scale up significantly for visibility
-        found.sprite.scale.set(3.5, 1.75, 1); // Much larger scale for clear readability
-      }
-
-      // Spin the tree to face the camera
+      // Animate camera and tree
       const camera = cameraRef.current;
       const startPos = camera.position.clone();
       const startRotation = treeGroupRef.current.rotation.y;
 
-      // Target rotation: rotate tree so ornament faces front (camera is at z=8)
       let targetRotation = -randomAngle;
       let rotationDiff = targetRotation - startRotation;
 
-      // Normalize to shortest path
       while (rotationDiff > Math.PI) rotationDiff -= Math.PI * 2;
       while (rotationDiff < -Math.PI) rotationDiff += Math.PI * 2;
 
-      // Camera zooms to front of tree at ornament height - closer for better view
-      const endPos = new THREE.Vector3(0, randomHeight, 3);
+      const endPos = new THREE.Vector3(0, randomHeight, 3.5);
 
       let progress = 0;
       const animateZoom = () => {
         progress += 0.015;
-
-        if (progress >= 1) {
-          progress = 1;
-        }
+        if (progress >= 1) progress = 1;
 
         const easeProgress = progress < 0.5
           ? 2 * progress * progress
@@ -948,8 +864,6 @@ export default function ChristmasTree() {
 
         camera.position.lerpVectors(startPos, endPos, easeProgress);
         camera.lookAt(0, randomHeight, 0);
-
-        // Spin tree to bring ornament to front
         treeGroupRef.current.rotation.y = startRotation + (rotationDiff * easeProgress);
 
         if (progress < 1) {
@@ -996,7 +910,7 @@ export default function ChristmasTree() {
             type="text"
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Search..."
             className="flex-1 px-2 sm:px-4 py-1.5 sm:py-3 rounded text-xs sm:text-lg bg-white/90 backdrop-blur-sm border-2 border-yellow-400 focus:outline-none focus:border-yellow-500"
           />
@@ -1009,6 +923,23 @@ export default function ChristmasTree() {
         </div>
       </div>
 
+      {/* Large centered name display */}
+      {displayedName && (
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-40">
+          <div className="bg-white px-8 py-6 rounded-2xl shadow-2xl" style={{
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <p className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center" style={{
+              color: '#FFD700',
+              textShadow: '3px 3px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000, 3px 3px 8px rgba(0,0,0,0.5)',
+              WebkitTextStroke: '2px black'
+            }}>
+              {displayedName}
+            </p>
+          </div>
+        </div>
+      )}
+
       {foundName && (
         <div className="absolute top-20 sm:top-40 md:top-48 left-2 right-2 sm:left-auto sm:right-6 sm:max-w-md bg-green-600 text-white px-3 sm:px-8 py-2 sm:py-4 rounded text-sm sm:text-xl font-bold animate-pulse text-center">
           🎉 Found: {foundName} 🎉
@@ -1016,7 +947,7 @@ export default function ChristmasTree() {
       )}
 
       {isZoomed && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50">
           <button
             onClick={resetView}
             className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-lg text-sm sm:text-base flex items-center gap-2"
