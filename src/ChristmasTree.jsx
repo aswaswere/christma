@@ -934,8 +934,8 @@ export default function ChristmasTree() {
         context.font = `Bold ${fontSize}px Georgia, serif`;
         let textWidth = context.measureText(found.name).width;
 
-        // Reduce font size if text is too wide (with padding for borders)
-        const maxWidth = canvas.width - 100; // Leave padding for borders and glow
+        // Reduce font size if text is too wide (with padding for white box)
+        const maxWidth = canvas.width - 200; // More padding for white box
         while (textWidth > maxWidth && fontSize > 30) {
           fontSize -= 2;
           context.font = `Bold ${fontSize}px Georgia, serif`;
@@ -945,27 +945,38 @@ export default function ChristmasTree() {
         context.textAlign = 'center';
         context.textBaseline = 'middle';
 
-        // Strong glow
-        context.shadowColor = 'rgba(255, 255, 255, 1.0)';
-        context.shadowBlur = 20;
+        // Draw white background box
+        const padding = 40;
+        const boxWidth = textWidth + padding * 2;
+        const boxHeight = fontSize + padding;
+        const boxX = (canvas.width - boxWidth) / 2;
+        const boxY = (canvas.height - boxHeight) / 2;
+
+        // White box with shadow
+        context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        context.shadowBlur = 15;
         context.shadowOffsetX = 0;
-        context.shadowOffsetY = 0;
+        context.shadowOffsetY = 5;
+        context.fillStyle = '#FFFFFF';
+        context.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+        // Reset shadow for text
+        context.shadowColor = 'rgba(0, 0, 0, 0)';
+        context.shadowBlur = 0;
 
         // Very thick black outline for maximum visibility
         context.strokeStyle = '#000000';
         context.lineWidth = 24; // Double thickness black border
-        context.strokeText(found.name, canvas.width / 2, 128);
+        context.strokeText(found.name, canvas.width / 2, canvas.height / 2);
 
         // White outline
         context.strokeStyle = '#ffffff';
         context.lineWidth = 6;
-        context.strokeText(found.name, canvas.width / 2, 128);
+        context.strokeText(found.name, canvas.width / 2, canvas.height / 2);
 
         // Bright gold fill
         context.fillStyle = '#FFD700';
-        context.shadowBlur = 15;
-        context.shadowColor = 'rgba(255, 215, 0, 0.8)';
-        context.fillText(found.name, canvas.width / 2, 128);
+        context.fillText(found.name, canvas.width / 2, canvas.height / 2);
 
         const texture = new THREE.CanvasTexture(canvas);
         found.sprite.material.map = texture;
