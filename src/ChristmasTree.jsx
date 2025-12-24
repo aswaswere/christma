@@ -409,7 +409,7 @@ export default function ChristmasTree() {
 
       {/* Found notification */}
       {highlightedName && (
-        <div className="absolute top-28 sm:top-36 md:top-40 left-2 right-2 sm:left-auto sm:right-6 sm:max-w-md bg-green-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded text-xs sm:text-lg font-bold animate-pulse text-center z-30">
+        <div className="absolute top-32 sm:top-40 md:top-44 left-2 right-2 sm:left-auto sm:right-6 sm:max-w-md bg-green-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded text-xs sm:text-lg font-bold animate-pulse text-center z-30">
           🎉 Found: {highlightedName} 🎉
         </div>
       )}
