@@ -351,49 +351,46 @@ export default function ChristmasTree() {
             <polygon points="44,32 44.5,33.5 46,34 44.5,34.5 44,36 43.5,34.5 42,34 43.5,33.5" fill="#ffd700" />
             <polygon points="56,44 56.5,45.5 58,46 56.5,46.5 56,48 55.5,46.5 54,46 55.5,45.5" fill="#ffd700" />
             <polygon points="36,68 36.5,69.5 38,70 36.5,70.5 36,72 35.5,70.5 34,70 35.5,69.5" fill="#ffd700" />
+
+            {/* Hanging names - now inside SVG for consistent positioning */}
+            {namePositions.map((pos) => {
+              const isHighlighted = pos.name === highlightedName;
+
+              return (
+                <g key={pos.name}>
+                  {/* Hanging string */}
+                  <line
+                    x1={pos.x}
+                    y1={pos.y - 0.8}
+                    x2={pos.x}
+                    y2={pos.y}
+                    stroke="#b8860b"
+                    strokeWidth="0.08"
+                  />
+
+                  {/* Name text */}
+                  <text
+                    x={pos.x}
+                    y={pos.y}
+                    textAnchor="middle"
+                    dominantBaseline="hanging"
+                    fill={isHighlighted ? '#ffd700' : '#d4af37'}
+                    stroke="#000"
+                    strokeWidth={isHighlighted ? "0.15" : "0.03"}
+                    paintOrder="stroke"
+                    style={{
+                      fontSize: isHighlighted ? '2.5px' : '0.5px',
+                      fontWeight: 'bold',
+                      transition: 'all 0.3s',
+                      filter: isHighlighted ? 'drop-shadow(0 0 0.5px rgba(255,215,0,0.8))' : 'none',
+                    }}
+                  >
+                    {pos.name}
+                  </text>
+                </g>
+              );
+            })}
           </svg>
-
-          {/* Hanging names */}
-          {namePositions.map((pos) => {
-            const isHighlighted = pos.name === highlightedName;
-
-            return (
-              <div
-                key={pos.name}
-                className="absolute transition-all duration-300"
-                style={{
-                  left: `${pos.x}%`,
-                  top: `${pos.y}%`,
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: isHighlighted ? 20 : 10,
-                }}
-              >
-                {/* Hanging string */}
-                <div
-                  className="absolute bottom-full left-1/2 bg-yellow-700"
-                  style={{
-                    width: '1px',
-                    height: '8px',
-                    transform: 'translateX(-50%)',
-                  }}
-                />
-
-                {/* Name - hanging like decoration, no box */}
-                <p
-                  className="font-bold text-center whitespace-nowrap transition-all duration-300"
-                  style={{
-                    fontSize: isHighlighted ? '16px' : '3px',
-                    color: isHighlighted ? '#ffd700' : '#d4af37',
-                    textShadow: isHighlighted
-                      ? '0 0 10px rgba(255,215,0,0.8), 0 2px 4px rgba(0,0,0,0.5), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'
-                      : '0 0.5px 1px rgba(0,0,0,0.5), 0.3px 0.3px 0 #000, -0.3px -0.3px 0 #000',
-                  }}
-                >
-                  {pos.name}
-                </p>
-              </div>
-            );
-          })}
         </div>
       </div>
 
