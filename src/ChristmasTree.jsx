@@ -730,36 +730,48 @@ export default function ChristmasTree() {
       // Name text - no background, clean and archival
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      canvas.width = 512;
+      canvas.width = 1024; // Wider canvas to prevent cropping
       canvas.height = 256;
-      
+
       context.clearRect(0, 0, canvas.width, canvas.height);
-      
-      context.font = 'Bold 65px Georgia, serif'; // More elegant serif font
+
+      // Calculate optimal font size based on name length
+      let fontSize = 65;
+      context.font = `Bold ${fontSize}px Georgia, serif`;
+      let textWidth = context.measureText(name).width;
+
+      // Reduce font size if text is too wide (with padding for borders)
+      const maxWidth = canvas.width - 80; // Leave padding for borders and glow
+      while (textWidth > maxWidth && fontSize > 25) {
+        fontSize -= 2;
+        context.font = `Bold ${fontSize}px Georgia, serif`;
+        textWidth = context.measureText(name).width;
+      }
+
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      
+
       // Subtle glow
       context.shadowColor = 'rgba(255, 255, 255, 0.9)';
       context.shadowBlur = 12;
       context.shadowOffsetX = 0;
       context.shadowOffsetY = 0;
-      
+
       // Thin white outline
       context.strokeStyle = '#ffffff';
       context.lineWidth = 6;
-      context.strokeText(name, 256, 128);
-      
+      context.strokeText(name, canvas.width / 2, 128);
+
       // Very thin dark outline for definition
       context.strokeStyle = '#000000';
       context.lineWidth = 2;
-      context.strokeText(name, 256, 128);
-      
+      context.strokeText(name, canvas.width / 2, 128);
+
       // Gold fill
       context.fillStyle = '#E8C468';
       context.shadowBlur = 10;
       context.shadowColor = 'rgba(232, 196, 104, 0.6)';
-      context.fillText(name, 256, 128);
+      context.fillText(name, canvas.width / 2, 128);
 
       const texture = new THREE.CanvasTexture(canvas);
       const spriteMaterial = new THREE.SpriteMaterial({ 
@@ -884,12 +896,24 @@ export default function ChristmasTree() {
       if (found.sprite) {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = 512;
+        canvas.width = 1024; // Wider canvas to prevent cropping
         canvas.height = 256;
 
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        context.font = 'Bold 70px Georgia, serif';
+        // Calculate optimal font size based on name length
+        let fontSize = 70;
+        context.font = `Bold ${fontSize}px Georgia, serif`;
+        let textWidth = context.measureText(found.name).width;
+
+        // Reduce font size if text is too wide (with padding for borders)
+        const maxWidth = canvas.width - 100; // Leave padding for borders and glow
+        while (textWidth > maxWidth && fontSize > 30) {
+          fontSize -= 2;
+          context.font = `Bold ${fontSize}px Georgia, serif`;
+          textWidth = context.measureText(found.name).width;
+        }
+
         context.textAlign = 'center';
         context.textBaseline = 'middle';
 
@@ -902,18 +926,18 @@ export default function ChristmasTree() {
         // Thick black outline for visibility
         context.strokeStyle = '#000000';
         context.lineWidth = 12; // Thicker black border
-        context.strokeText(found.name, 256, 128);
+        context.strokeText(found.name, canvas.width / 2, 128);
 
         // White outline
         context.strokeStyle = '#ffffff';
         context.lineWidth = 6;
-        context.strokeText(found.name, 256, 128);
+        context.strokeText(found.name, canvas.width / 2, 128);
 
         // Bright gold fill
         context.fillStyle = '#FFD700';
         context.shadowBlur = 15;
         context.shadowColor = 'rgba(255, 215, 0, 0.8)';
-        context.fillText(found.name, 256, 128);
+        context.fillText(found.name, canvas.width / 2, 128);
 
         const texture = new THREE.CanvasTexture(canvas);
         found.sprite.material.map = texture;
