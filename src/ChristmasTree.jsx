@@ -913,6 +913,9 @@ export default function ChristmasTree() {
         found.sprite.material.depthWrite = false;
         found.sprite.renderOrder = 1000;
         found.sprite.material.needsUpdate = true;
+
+        // Make the sprite MUCH larger when searched - scale up significantly for visibility
+        found.sprite.scale.set(3.5, 1.75, 1); // Much larger scale for clear readability
       }
 
       // Spin the tree to face the camera
@@ -928,8 +931,8 @@ export default function ChristmasTree() {
       while (rotationDiff > Math.PI) rotationDiff -= Math.PI * 2;
       while (rotationDiff < -Math.PI) rotationDiff += Math.PI * 2;
 
-      // Camera zooms to front of tree at ornament height
-      const endPos = new THREE.Vector3(0, randomHeight, 4);
+      // Camera zooms to front of tree at ornament height - closer for better view
+      const endPos = new THREE.Vector3(0, randomHeight, 3);
 
       let progress = 0;
       const animateZoom = () => {
