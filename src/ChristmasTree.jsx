@@ -31,14 +31,19 @@ export default function ChristmasTree() {
 
   // Generate FIXED positions for names - use index as seed for consistent placement
   const namePositions = names.map((name, index) => {
-    const yPercent = 20 + (index / names.length) * 55; // 20% to 75% height (tree area)
+    const yPercent = 22 + (index / names.length) * 54; // 22% to 76% height (tree area)
 
-    // Calculate tree width at this height (triangle shape)
-    const treeWidthAtY = ((yPercent - 20) / 55) * 35; // 0 to 35% from center
+    // Calculate tree width at this height (triangle shape from SVG points)
+    // Tree starts narrow at top and widens at bottom
+    // Top is at y=18, bottom at y=80
+    // At y=22: width = ~12 units from center
+    // At y=76: width = ~33 units from center
+    const normalizedY = (yPercent - 22) / 54; // 0 to 1
+    const treeWidthAtY = 12 + normalizedY * 21; // 12 to 33 units from center
 
     // Use index-based pseudo-random for stable positions
     const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2; // 0 to 1, stable per index
-    const xPercent = 50 + (pseudoRandom - 0.5) * treeWidthAtY;
+    const xPercent = 50 + (pseudoRandom - 0.5) * (treeWidthAtY * 0.85); // 0.85 to keep within tree
 
     return {
       name,
@@ -146,9 +151,9 @@ export default function ChristmasTree() {
             {/* Tree trunk */}
             <rect x="44" y="80" width="12" height="15" fill="#5d4037" rx="1" />
 
-            {/* Smaller star on top */}
-            <g transform="translate(50, 12)">
-              <polygon points="0,-5 1.5,-1.5 5,-1.5 2,1 3,5 0,2.5 -3,5 -2,1 -5,-1.5 -1.5,-1.5" fill="#ffd700" stroke="#ffed4e" strokeWidth="0.3" />
+            {/* Small star on top */}
+            <g transform="translate(50, 13)">
+              <polygon points="0,-3 1,-1 3,-1 1.2,0.5 2,3 0,1.5 -2,3 -1.2,0.5 -3,-1 -1,-1" fill="#ffd700" stroke="#ffed4e" strokeWidth="0.2" />
             </g>
 
             {/* Garland/beads */}
