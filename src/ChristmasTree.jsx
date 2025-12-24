@@ -784,7 +784,8 @@ export default function ChristmasTree() {
         cap,
         angle,
         position: new THREE.Vector3(x, height, z),
-        material: ornamentMaterial
+        material: ornamentMaterial,
+        originalTexture: texture // Store original texture for reset
       });
     });
   }, [names]);
@@ -804,9 +805,13 @@ export default function ChristmasTree() {
     ornamentsRef.current.forEach(ornament => {
       ornament.material.emissive.setHex(0x000000);
       ornament.material.opacity = 1;
-      // Reset name sprite opacity to default based on distance
+      // Reset name sprite opacity and texture to default
       if (ornament.sprite && ornament.sprite.material) {
         ornament.sprite.material.opacity = 0.2; // Back to default subtle visibility
+        if (ornament.originalTexture) {
+          ornament.sprite.material.map = ornament.originalTexture;
+          ornament.sprite.material.needsUpdate = true;
+        }
       }
     });
 
@@ -839,22 +844,22 @@ export default function ChristmasTree() {
       setFoundName(found.name);
       setIsZoomed(true);
 
-      // Dim down tree and other ornaments significantly
+      // Dim down tree and other ornaments by 50%
       treeObjectsRef.current.forEach(obj => {
         if (obj.material) {
           obj.material.transparent = true;
-          obj.material.opacity = 0.15; // More dimmed
+          obj.material.opacity = 0.5; // 50% dimmed
         }
       });
 
-      // Dim down all ornaments and their name labels
+      // Dim down all ornaments and their name labels by 50%
       ornamentsRef.current.forEach(ornament => {
         ornament.material.emissive.setHex(0x000000);
         ornament.material.transparent = true;
-        ornament.material.opacity = 0.15; // More dimmed
+        ornament.material.opacity = 0.5; // 50% dimmed
         // Dim the name sprite too
         if (ornament.sprite && ornament.sprite.material) {
-          ornament.sprite.material.opacity = 0.05;
+          ornament.sprite.material.opacity = 0.1; // Dimmed names
         }
       });
 
@@ -862,9 +867,46 @@ export default function ChristmasTree() {
       found.material.emissive.setHex(0xffdd00); // Brighter gold
       found.material.emissiveIntensity = 1.2; // More intense glow
       found.material.opacity = 1;
-      // Make the found name very visible
-      if (found.sprite && found.sprite.material) {
-        found.sprite.material.opacity = 1.0; // Fully visible
+
+      // Create a new highlighted name with thick black border
+      if (found.sprite) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = 512;
+        canvas.height = 256;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        context.font = 'Bold 70px Georgia, serif';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+
+        // Strong glow
+        context.shadowColor = 'rgba(255, 255, 255, 1.0)';
+        context.shadowBlur = 20;
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+
+        // Thick black outline for visibility
+        context.strokeStyle = '#000000';
+        context.lineWidth = 12; // Thicker black border
+        context.strokeText(found.name, 256, 128);
+
+        // White outline
+        context.strokeStyle = '#ffffff';
+        context.lineWidth = 6;
+        context.strokeText(found.name, 256, 128);
+
+        // Bright gold fill
+        context.fillStyle = '#FFD700';
+        context.shadowBlur = 15;
+        context.shadowColor = 'rgba(255, 215, 0, 0.8)';
+        context.fillText(found.name, 256, 128);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        found.sprite.material.map = texture;
+        found.sprite.material.opacity = 1.0;
+        found.sprite.material.needsUpdate = true;
       }
 
       const worldPos = new THREE.Vector3();
