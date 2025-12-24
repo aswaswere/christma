@@ -29,10 +29,13 @@ export default function ChristmasTree() {
   const [zoomTransform, setZoomTransform] = useState({ scale: 1, x: 0, y: 0 });
   const treeRef = useRef(null);
 
-  // Generate positions for names - scattered across tree
+  // Generate positions for names - scattered across tree shape only
   const namePositions = names.map((name, index) => {
-    const yPercent = 15 + (index / names.length) * 60; // 15% to 75% height
-    const treeWidthAtY = 70 - (yPercent * 0.6); // Wider at bottom
+    const yPercent = 20 + (index / names.length) * 55; // 20% to 75% height (tree area)
+
+    // Calculate tree width at this height (triangle shape)
+    // Tree goes from point at top (50%) to wide at bottom (70% width)
+    const treeWidthAtY = ((yPercent - 20) / 55) * 35; // 0 to 35% from center
     const xPercent = 50 + (Math.random() - 0.5) * treeWidthAtY;
 
     return {
@@ -184,28 +187,19 @@ export default function ChristmasTree() {
                   }}
                 />
 
-                {/* Name tag - small by default */}
-                <div
-                  className={`px-1 py-0.5 rounded transition-all duration-300 ${
-                    isHighlighted ? 'bg-white shadow-2xl' : 'bg-white/90'
-                  }`}
+                {/* Name - hanging like decoration, no box */}
+                <p
+                  className="font-bold text-center whitespace-nowrap transition-all duration-300"
                   style={{
-                    fontSize: isHighlighted ? '14px' : '6px',
-                    boxShadow: isHighlighted
-                      ? '0 0 20px rgba(255,215,0,0.9), 0 4px 15px rgba(0,0,0,0.3)'
-                      : '0 1px 2px rgba(0,0,0,0.2)',
+                    fontSize: isHighlighted ? '16px' : '7px',
+                    color: isHighlighted ? '#ffd700' : '#d4af37',
+                    textShadow: isHighlighted
+                      ? '0 0 10px rgba(255,215,0,0.8), 0 2px 4px rgba(0,0,0,0.5), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'
+                      : '0 1px 2px rgba(0,0,0,0.5), 0.5px 0.5px 0 #000, -0.5px -0.5px 0 #000',
                   }}
                 >
-                  <p
-                    className="font-bold text-center whitespace-nowrap"
-                    style={{
-                      color: isHighlighted ? '#d4af37' : '#2d5016',
-                      textShadow: isHighlighted ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
-                    }}
-                  >
-                    {pos.name}
-                  </p>
-                </div>
+                  {pos.name}
+                </p>
               </div>
             );
           })}
