@@ -573,32 +573,38 @@ export default function ChristmasTree() {
 
     // Animation
     let time = 0;
+    // Throttle heavy calculations for mobile performance
+    let frameCount = 0;
     const animate = () => {
       requestAnimationFrame(animate);
       time += 0.01;
+      frameCount++;
 
       treeGroup.rotation.y += 0.002;
 
+      // Update lights every frame (lightweight)
       lightsRef.current.forEach((light, index) => {
         const twinkle = Math.sin(time * 2.5 + index) * 0.3 + 0.8;
         light.mesh.material.emissiveIntensity = light.baseIntensity * twinkle;
       });
 
-      // Update name scales based on camera distance
-      ornamentsRef.current.forEach(ornament => {
-        const worldPos = new THREE.Vector3();
-        ornament.mesh.getWorldPosition(worldPos);
-        const distance = cameraRef.current.position.distanceTo(worldPos);
-        
-        // Scale inversely with distance - very small at default zoom
-        const baseScale = 0.15; // Much smaller at default distance
-        const scale = Math.min(baseScale * (10 / distance), 2.5);
-        ornament.sprite.scale.set(scale * 1.8, scale * 0.9, 1);
-        
-        // Opacity and glow increase as camera gets closer
-        const opacity = Math.min((10 / distance) * 0.2, 1);
-        ornament.sprite.material.opacity = opacity;
-      });
+      // Update name scales less frequently (every 3 frames) for better mobile performance
+      if (frameCount % 3 === 0) {
+        ornamentsRef.current.forEach(ornament => {
+          const worldPos = new THREE.Vector3();
+          ornament.mesh.getWorldPosition(worldPos);
+          const distance = cameraRef.current.position.distanceTo(worldPos);
+
+          // Scale inversely with distance - very small at default zoom
+          const baseScale = 0.15; // Much smaller at default distance
+          const scale = Math.min(baseScale * (10 / distance), 2.5);
+          ornament.sprite.scale.set(scale * 1.8, scale * 0.9, 1);
+
+          // Opacity and glow increase as camera gets closer
+          const opacity = Math.min((10 / distance) * 0.2, 1);
+          ornament.sprite.material.opacity = opacity;
+        });
+      }
 
       // Animate snowflakes - falling and rotating
       snowflakeGroup.children.forEach(snowflake => {
@@ -832,12 +838,12 @@ export default function ChristmasTree() {
       }
     });
 
-    // Animate back to default view
+    // Animate back to default view using requestAnimationFrame for smoother performance
     let progress = 0;
-    const resetAnimation = setInterval(() => {
-      progress += 0.015;
+    const animateReset = () => {
+      progress += 0.02; // Slightly faster for quicker return
+
       if (progress >= 1) {
-        clearInterval(resetAnimation);
         progress = 1;
         setIsZoomed(false);
         setFoundName(null);
@@ -849,7 +855,13 @@ export default function ChristmasTree() {
 
       camera.position.lerpVectors(startPos, defaultPos, easeProgress);
       camera.lookAt(0, 2, 0);
-    }, 16);
+
+      // Continue animation if not finished
+      if (progress < 1) {
+        requestAnimationFrame(animateReset);
+      }
+    };
+    requestAnimationFrame(animateReset);
   };
 
   const handleSearch = () => {
@@ -975,10 +987,10 @@ export default function ChristmasTree() {
       const endPos = new THREE.Vector3(cameraX, cameraY, cameraZ);
 
       let progress = 0;
-      const zoomAnimation = setInterval(() => {
-        progress += 0.01; // Slightly faster animation
+      const animateZoom = () => {
+        progress += 0.015; // Smoother increment for mobile
+
         if (progress >= 1) {
-          clearInterval(zoomAnimation);
           progress = 1;
         }
 
@@ -995,7 +1007,13 @@ export default function ChristmasTree() {
 
         // Gentle single rotation
         treeGroupRef.current.rotation.y = startRotation + (rotationDiff * easeProgress);
-      }, 16);
+
+        // Continue animation if not finished
+        if (progress < 1) {
+          requestAnimationFrame(animateZoom);
+        }
+      };
+      requestAnimationFrame(animateZoom);
     } else {
       alert('Name not found on the tree!');
     }
