@@ -165,17 +165,23 @@ export default function ChristmasTree() {
 
   // Generate FIXED positions for names - use index as seed for consistent placement
   const namePositions = names.map((name, index) => {
-    const yPercent = 24 + (index / names.length) * 50; // 24% to 74% height (tree area)
+    // Tree SVG coordinates: top at y=18, bottom at y=80
+    // We'll distribute names from y=28 to y=75 (within visible tree area)
+    const yPercent = 28 + (index / names.length) * 47; // 28% to 75% height
 
-    // Calculate tree width at this height (triangle shape from SVG points)
-    // Tree: top at y=18 (narrow), bottom at y=80 (wide)
-    // More conservative width calculation to keep names inside
-    const normalizedY = (yPercent - 24) / 50; // 0 to 1
-    const treeWidthAtY = 8 + normalizedY * 24; // 8 to 32 units from center (conservative)
+    // Calculate tree width at this height based on actual SVG polygon points
+    // Tree shape: y=18->width=24, y=28->width=26, y=38->width=36, y=50->width=46, y=65->width=56, y=80->width=64
+    // Using linear interpolation between tiers
+    const normalizedY = (yPercent - 28) / 47; // 0 to 1
+
+    // Much tighter bounds - tree width from center
+    // At y=28 (top): ~13 units from center (26/2)
+    // At y=75 (bottom): ~30 units from center (60/2)
+    const treeWidthAtY = 6 + normalizedY * 18; // 6 to 24 units from center (very conservative)
 
     // Use index-based pseudo-random for stable positions
     const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2; // 0 to 1, stable per index
-    const xPercent = 50 + (pseudoRandom - 0.5) * (treeWidthAtY * 0.7); // 0.7 to keep well within tree
+    const xPercent = 50 + (pseudoRandom - 0.5) * (treeWidthAtY * 0.55); // 0.55 multiplier for extra safety
 
     return {
       name,
