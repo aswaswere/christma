@@ -163,32 +163,42 @@ export default function ChristmasTree() {
   const [zoomTransform, setZoomTransform] = useState({ scale: 1, x: 0, y: 0 });
   const treeRef = useRef(null);
 
-  // Generate FIXED positions for names - ONLY on green foliage tiers
+  // Generate FIXED positions for names - ONLY within triangular green polygon areas
   const namePositions = names.map((name, index) => {
-    // Define the 5 tree tiers with their actual green foliage boundaries
+    // Define the 5 tree tiers with TRIANGLE boundaries (apex and base)
+    // Each tier is a triangle: apex at top center, base at bottom
     const tiers = [
-      { yStart: 20, yEnd: 28, xMin: 38, xMax: 62 },   // Top tier
-      { yStart: 28, yEnd: 38, xMin: 33, xMax: 67 },   // Second tier
-      { yStart: 38, yEnd: 50, xMin: 28, xMax: 72 },   // Third tier
-      { yStart: 50, yEnd: 65, xMin: 23, xMax: 77 },   // Fourth tier
-      { yStart: 65, yEnd: 78, xMin: 18, xMax: 82 },   // Bottom tier
+      { apexY: 18, baseY: 28, apexX: 50, baseLeft: 38, baseRight: 62 },   // Top tier
+      { apexY: 24, baseY: 38, apexX: 50, baseLeft: 33, baseRight: 67 },   // Second tier
+      { apexY: 34, baseY: 50, apexX: 50, baseLeft: 28, baseRight: 72 },   // Third tier
+      { apexY: 46, baseY: 65, apexX: 50, baseLeft: 23, baseRight: 77 },   // Fourth tier
+      { apexY: 58, baseY: 80, apexX: 50, baseLeft: 18, baseRight: 82 },   // Bottom tier
     ];
 
     // Distribute names across tiers
     const tierIndex = Math.floor((index / names.length) * tiers.length);
     const tier = tiers[Math.min(tierIndex, tiers.length - 1)];
 
-    // Position within this specific tier using stable pseudo-random
-    const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2;
-    const pseudoRandom2 = (Math.sin(index * 78.233) + 1) / 2;
+    // Stable pseudo-random values
+    const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2;  // For X
+    const pseudoRandom2 = (Math.sin(index * 78.233) + 1) / 2;  // For Y
 
-    // Y position within the tier's green area
-    const yPercent = tier.yStart + pseudoRandom2 * (tier.yEnd - tier.yStart);
+    // Y position within the tier (with 10% margin from top and bottom)
+    const tierHeight = tier.baseY - tier.apexY;
+    const yMargin = tierHeight * 0.1;
+    const yPercent = tier.apexY + yMargin + pseudoRandom2 * (tierHeight - 2 * yMargin);
 
-    // X position within the tier's width (with safety margin)
-    const tierWidth = tier.xMax - tier.xMin;
-    const safetyMargin = tierWidth * 0.15; // 15% margin from edges
-    const xPercent = tier.xMin + safetyMargin + pseudoRandom * (tierWidth - 2 * safetyMargin);
+    // Calculate triangle width at this Y position
+    // Triangle narrows linearly from base to apex
+    const yRatio = (yPercent - tier.apexY) / tierHeight; // 0 at apex, 1 at base
+    const widthAtY = yRatio * (tier.baseRight - tier.baseLeft);
+    const leftEdgeAtY = tier.apexX - widthAtY / 2;
+    const rightEdgeAtY = tier.apexX + widthAtY / 2;
+
+    // X position within triangle width at this Y (with 10% margin from edges)
+    const availableWidth = rightEdgeAtY - leftEdgeAtY;
+    const xMargin = availableWidth * 0.1;
+    const xPercent = leftEdgeAtY + xMargin + pseudoRandom * (availableWidth - 2 * xMargin);
 
     return {
       name,
