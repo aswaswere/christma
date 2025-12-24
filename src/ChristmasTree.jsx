@@ -236,23 +236,36 @@ export default function ChristmasTree() {
         </h1>
       </div>
 
-      {/* Search Bar */}
+      {/* Search Bar and Back Button */}
       <div className="absolute top-12 sm:top-20 md:top-24 left-2 right-2 sm:left-auto sm:right-6 sm:w-72 z-30">
-        <div className="flex gap-1 sm:gap-2">
-          <input
-            type="text"
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Search..."
-            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-base bg-white/90 backdrop-blur-sm border-2 border-yellow-400 focus:outline-none focus:border-yellow-500"
-          />
-          <button
-            onClick={handleSearch}
-            className="px-3 sm:px-5 py-1.5 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded font-semibold transition-colors text-xs sm:text-base"
-          >
-            🔍
-          </button>
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-1 sm:gap-2">
+            <input
+              type="text"
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Search..."
+              className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-base bg-white/90 backdrop-blur-sm border-2 border-yellow-400 focus:outline-none focus:border-yellow-500"
+            />
+            <button
+              onClick={handleSearch}
+              className="px-3 sm:px-5 py-1.5 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded font-semibold transition-colors text-xs sm:text-base"
+            >
+              🔍
+            </button>
+          </div>
+
+          {/* Back button - shown below search */}
+          {highlightedName && (
+            <button
+              onClick={resetView}
+              className="w-full px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition-colors shadow-lg text-xs sm:text-base flex items-center justify-center gap-2"
+            >
+              <span>←</span>
+              <span>Back</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -304,7 +317,7 @@ export default function ChristmasTree() {
             <polygon points="80,68 82,70 79,71" fill="#34643d" />
 
             {/* Tree trunk */}
-            <rect x="44" y="80" width="12" height="15" fill="#5d4037" rx="1" />
+            <rect x="47" y="80" width="6" height="15" fill="#5d4037" rx="1" />
 
             {/* Small star on top */}
             <g transform="translate(50, 13)">
@@ -396,21 +409,8 @@ export default function ChristmasTree() {
 
       {/* Found notification */}
       {highlightedName && (
-        <div className="absolute top-16 sm:top-28 md:top-32 left-2 right-2 sm:left-auto sm:right-6 sm:max-w-md bg-green-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded text-xs sm:text-lg font-bold animate-pulse text-center z-30">
+        <div className="absolute top-24 sm:top-36 md:top-40 left-2 right-2 sm:left-auto sm:right-6 sm:max-w-md bg-green-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded text-xs sm:text-lg font-bold animate-pulse text-center z-30">
           🎉 Found: {highlightedName} 🎉
-        </div>
-      )}
-
-      {/* Reset button */}
-      {highlightedName && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-40">
-          <button
-            onClick={resetView}
-            className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-lg text-sm sm:text-base flex items-center gap-2"
-          >
-            <span>←</span>
-            <span>Back</span>
-          </button>
         </div>
       )}
 
