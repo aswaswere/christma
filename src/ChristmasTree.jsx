@@ -805,9 +805,14 @@ export default function ChristmasTree() {
     ornamentsRef.current.forEach(ornament => {
       ornament.material.emissive.setHex(0x000000);
       ornament.material.opacity = 1;
-      // Reset name sprite opacity and texture to default
+      ornament.material.depthTest = true;
+      ornament.material.depthWrite = true;
+      // Reset name sprite opacity, texture, and rendering order to default
       if (ornament.sprite && ornament.sprite.material) {
         ornament.sprite.material.opacity = 0.2; // Back to default subtle visibility
+        ornament.sprite.renderOrder = 999; // Back to default render order
+        ornament.sprite.material.depthTest = false; // Back to default
+        ornament.sprite.material.depthWrite = false;
         if (ornament.originalTexture) {
           ornament.sprite.material.map = ornament.originalTexture;
           ornament.sprite.material.needsUpdate = true;
@@ -857,9 +862,14 @@ export default function ChristmasTree() {
         ornament.material.emissive.setHex(0x000000);
         ornament.material.transparent = true;
         ornament.material.opacity = 0.3; // Heavily dimmed
-        // Make other names nearly invisible
+        ornament.material.depthTest = true;
+        ornament.material.depthWrite = true;
+        // Make other names nearly invisible and push to back layers
         if (ornament.sprite && ornament.sprite.material) {
           ornament.sprite.material.opacity = 0.02; // Almost invisible
+          ornament.sprite.renderOrder = -5; // Push to back layers (4th, 5th layer)
+          ornament.sprite.material.depthTest = true;
+          ornament.sprite.material.depthWrite = false;
         }
       });
 
@@ -867,6 +877,8 @@ export default function ChristmasTree() {
       found.material.emissive.setHex(0xffdd00); // Brighter gold
       found.material.emissiveIntensity = 1.2; // More intense glow
       found.material.opacity = 1;
+      found.material.depthTest = false; // Render on top
+      found.material.depthWrite = false;
 
       // Create a new highlighted name with thick black border
       if (found.sprite) {
@@ -906,6 +918,9 @@ export default function ChristmasTree() {
         const texture = new THREE.CanvasTexture(canvas);
         found.sprite.material.map = texture;
         found.sprite.material.opacity = 1.0;
+        found.sprite.material.depthTest = false; // Render on top, ignore depth
+        found.sprite.material.depthWrite = false;
+        found.sprite.renderOrder = 1000; // Bring to front layer (layer 1)
         found.sprite.material.needsUpdate = true;
       }
 
