@@ -319,6 +319,64 @@ export default function ChristmasTree() {
             {/* Tree trunk */}
             <rect x="47" y="80" width="6" height="15" fill="#5d4037" rx="1" />
 
+            {/* Gift boxes - Left side (3 boxes) */}
+            {/* Left box 1 - red with gold ribbon */}
+            <g>
+              <rect x="28" y="86" width="6" height="5" fill="#c41e3a" rx="0.3" />
+              <rect x="30.7" y="85.5" width="0.6" height="6" fill="#ffd700" />
+              <rect x="28" y="88" width="6" height="0.6" fill="#ffd700" />
+              <path d="M 31,85.5 L 30,84 L 32,84 Z" fill="#ffd700" />
+            </g>
+
+            {/* Left box 2 - green with silver ribbon */}
+            <g>
+              <rect x="21" y="88" width="5" height="4" fill="#2d5a3d" rx="0.3" />
+              <rect x="23.2" y="87.5" width="0.5" height="5" fill="#e8e8e8" />
+              <rect x="21" y="89.7" width="5" height="0.5" fill="#e8e8e8" />
+              <path d="M 23.5,87.5 L 22.7,86.2 L 24.3,86.2 Z" fill="#e8e8e8" />
+            </g>
+
+            {/* Left box 3 - blue with red ribbon */}
+            <g>
+              <rect x="29" y="91" width="4.5" height="4" fill="#1e88e5" rx="0.3" />
+              <rect x="31" y="90.5" width="0.5" height="5" fill="#c41e3a" />
+              <rect x="29" y="92.7" width="4.5" height="0.5" fill="#c41e3a" />
+              <path d="M 31.25,90.5 L 30.5,89.3 L 32,89.3 Z" fill="#c41e3a" />
+            </g>
+
+            {/* Gift boxes - Right side (4 boxes) */}
+            {/* Right box 1 - gold with red ribbon */}
+            <g>
+              <rect x="56" y="85" width="6.5" height="5.5" fill="#ffd700" rx="0.3" />
+              <rect x="59" y="84.5" width="0.6" height="6.5" fill="#c41e3a" />
+              <rect x="56" y="87.5" width="6.5" height="0.6" fill="#c41e3a" />
+              <path d="M 59.3,84.5 L 58.3,83 L 60.3,83 Z" fill="#c41e3a" />
+            </g>
+
+            {/* Right box 2 - purple with gold ribbon */}
+            <g>
+              <rect x="64" y="87" width="5" height="4.5" fill="#7b1fa2" rx="0.3" />
+              <rect x="66.2" y="86.5" width="0.5" height="5.5" fill="#ffd700" />
+              <rect x="64" y="89" width="5" height="0.5" fill="#ffd700" />
+              <path d="M 66.5,86.5 L 65.7,85.2 L 67.3,85.2 Z" fill="#ffd700" />
+            </g>
+
+            {/* Right box 3 - red with white ribbon */}
+            <g>
+              <rect x="62" y="91" width="4" height="4" fill="#d32f2f" rx="0.3" />
+              <rect x="63.7" y="90.5" width="0.5" height="5" fill="#ffffff" />
+              <rect x="62" y="92.7" width="4" height="0.5" fill="#ffffff" />
+              <path d="M 64,90.5 L 63.2,89.2 L 64.8,89.2 Z" fill="#ffffff" />
+            </g>
+
+            {/* Right box 4 - green with silver ribbon */}
+            <g>
+              <rect x="57" y="90" width="4.5" height="5" fill="#43a047" rx="0.3" />
+              <rect x="59" y="89.5" width="0.5" height="6" fill="#e8e8e8" />
+              <rect x="57" y="92.2" width="4.5" height="0.5" fill="#e8e8e8" />
+              <path d="M 59.25,89.5 L 58.4,88.2 L 60.1,88.2 Z" fill="#e8e8e8" />
+            </g>
+
             {/* Small star on top */}
             <g transform="translate(50, 13)">
               <polygon points="0,-3 1,-1 3,-1 1.2,0.5 2,3 0,1.5 -2,3 -1.2,0.5 -3,-1 -1,-1" fill="#ffd700" stroke="#ffed4e" strokeWidth="0.2" />
