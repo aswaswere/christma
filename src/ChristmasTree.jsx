@@ -29,14 +29,16 @@ export default function ChristmasTree() {
   const [zoomTransform, setZoomTransform] = useState({ scale: 1, x: 0, y: 0 });
   const treeRef = useRef(null);
 
-  // Generate positions for names - scattered across tree shape only
+  // Generate FIXED positions for names - use index as seed for consistent placement
   const namePositions = names.map((name, index) => {
     const yPercent = 20 + (index / names.length) * 55; // 20% to 75% height (tree area)
 
     // Calculate tree width at this height (triangle shape)
-    // Tree goes from point at top (50%) to wide at bottom (70% width)
     const treeWidthAtY = ((yPercent - 20) / 55) * 35; // 0 to 35% from center
-    const xPercent = 50 + (Math.random() - 0.5) * treeWidthAtY;
+
+    // Use index-based pseudo-random for stable positions
+    const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2; // 0 to 1, stable per index
+    const xPercent = 50 + (pseudoRandom - 0.5) * treeWidthAtY;
 
     return {
       name,
@@ -105,19 +107,48 @@ export default function ChristmasTree() {
         >
           {/* Tree SVG */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-            {/* Tree layers - 5 triangular sections */}
-            <polygon points="50,18 35,28 65,28" fill="#2d6b3f" />
-            <polygon points="50,23 30,38 70,38" fill="#347a45" />
-            <polygon points="50,33 25,50 75,50" fill="#2d6b3f" />
-            <polygon points="50,45 20,65 80,65" fill="#347a45" />
-            <polygon points="50,58 15,80 85,80" fill="#2d6b3f" />
+            {/* Tree layers - multiple overlapping for ferny look */}
+            {/* Top tier */}
+            <polygon points="50,18 38,28 62,28" fill="#2d5a3d" />
+            <polygon points="50,18 36,28 64,28" fill="#34643d" opacity="0.9" />
+            <polygon points="48,20 35,29 50,27 65,29 52,20" fill="#3d7a4e" />
+
+            {/* Second tier */}
+            <polygon points="50,24 33,38 67,38" fill="#2d5a3d" />
+            <polygon points="50,24 31,38 69,38" fill="#34643d" opacity="0.9" />
+            <polygon points="48,26 30,39 50,36 70,39 52,26" fill="#3d7a4e" />
+
+            {/* Third tier */}
+            <polygon points="50,34 28,50 72,50" fill="#2d5a3d" />
+            <polygon points="50,34 26,50 74,50" fill="#34643d" opacity="0.9" />
+            <polygon points="48,36 25,51 50,47 75,51 52,36" fill="#3d7a4e" />
+
+            {/* Fourth tier */}
+            <polygon points="50,46 23,65 77,65" fill="#2d5a3d" />
+            <polygon points="50,46 21,65 79,65" fill="#34643d" opacity="0.9" />
+            <polygon points="48,48 20,66 50,61 80,66 52,48" fill="#3d7a4e" />
+
+            {/* Bottom tier */}
+            <polygon points="50,58 18,80 82,80" fill="#2d5a3d" />
+            <polygon points="50,58 16,80 84,80" fill="#34643d" opacity="0.9" />
+            <polygon points="48,60 15,81 50,75 85,81 52,60" fill="#3d7a4e" />
+
+            {/* Fern-like branches sticking out */}
+            <polygon points="35,30 33,32 36,33" fill="#2d5a3d" />
+            <polygon points="65,30 67,32 64,33" fill="#2d5a3d" />
+            <polygon points="30,42 28,44 31,45" fill="#34643d" />
+            <polygon points="70,42 72,44 69,45" fill="#34643d" />
+            <polygon points="25,55 23,57 26,58" fill="#2d5a3d" />
+            <polygon points="75,55 77,57 74,58" fill="#2d5a3d" />
+            <polygon points="20,68 18,70 21,71" fill="#34643d" />
+            <polygon points="80,68 82,70 79,71" fill="#34643d" />
 
             {/* Tree trunk */}
             <rect x="44" y="80" width="12" height="15" fill="#5d4037" rx="1" />
 
-            {/* Star on top */}
-            <g transform="translate(50, 10)">
-              <polygon points="0,-8 2,-2 8,-2 3,2 5,8 0,4 -5,8 -3,2 -8,-2 -2,-2" fill="#ffd700" stroke="#ffed4e" strokeWidth="0.5" />
+            {/* Smaller star on top */}
+            <g transform="translate(50, 12)">
+              <polygon points="0,-5 1.5,-1.5 5,-1.5 2,1 3,5 0,2.5 -3,5 -2,1 -5,-1.5 -1.5,-1.5" fill="#ffd700" stroke="#ffed4e" strokeWidth="0.3" />
             </g>
 
             {/* Garland/beads */}
@@ -191,11 +222,11 @@ export default function ChristmasTree() {
                 <p
                   className="font-bold text-center whitespace-nowrap transition-all duration-300"
                   style={{
-                    fontSize: isHighlighted ? '16px' : '7px',
+                    fontSize: isHighlighted ? '16px' : '5px',
                     color: isHighlighted ? '#ffd700' : '#d4af37',
                     textShadow: isHighlighted
                       ? '0 0 10px rgba(255,215,0,0.8), 0 2px 4px rgba(0,0,0,0.5), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'
-                      : '0 1px 2px rgba(0,0,0,0.5), 0.5px 0.5px 0 #000, -0.5px -0.5px 0 #000',
+                      : '0 0.5px 1px rgba(0,0,0,0.5), 0.3px 0.3px 0 #000, -0.3px -0.3px 0 #000',
                   }}
                 >
                   {pos.name}
