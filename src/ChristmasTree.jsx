@@ -804,6 +804,10 @@ export default function ChristmasTree() {
     ornamentsRef.current.forEach(ornament => {
       ornament.material.emissive.setHex(0x000000);
       ornament.material.opacity = 1;
+      // Reset name sprite opacity to default based on distance
+      if (ornament.sprite && ornament.sprite.material) {
+        ornament.sprite.material.opacity = 0.2; // Back to default subtle visibility
+      }
     });
 
     // Animate back to default view
@@ -835,22 +839,33 @@ export default function ChristmasTree() {
       setFoundName(found.name);
       setIsZoomed(true);
 
+      // Dim down tree and other ornaments significantly
       treeObjectsRef.current.forEach(obj => {
         if (obj.material) {
           obj.material.transparent = true;
-          obj.material.opacity = 0.25;
+          obj.material.opacity = 0.15; // More dimmed
         }
       });
 
+      // Dim down all ornaments and their name labels
       ornamentsRef.current.forEach(ornament => {
         ornament.material.emissive.setHex(0x000000);
         ornament.material.transparent = true;
-        ornament.material.opacity = 0.3;
+        ornament.material.opacity = 0.15; // More dimmed
+        // Dim the name sprite too
+        if (ornament.sprite && ornament.sprite.material) {
+          ornament.sprite.material.opacity = 0.05;
+        }
       });
 
-      found.material.emissive.setHex(0xffaa00);
-      found.material.emissiveIntensity = 0.9;
+      // Highlight the found ornament brightly
+      found.material.emissive.setHex(0xffdd00); // Brighter gold
+      found.material.emissiveIntensity = 1.2; // More intense glow
       found.material.opacity = 1;
+      // Make the found name very visible
+      if (found.sprite && found.sprite.material) {
+        found.sprite.material.opacity = 1.0; // Fully visible
+      }
 
       const worldPos = new THREE.Vector3();
       found.mesh.getWorldPosition(worldPos);
@@ -869,13 +884,14 @@ export default function ChristmasTree() {
       while (rotationDiff > Math.PI) rotationDiff -= Math.PI * 2;
       while (rotationDiff < -Math.PI) rotationDiff += Math.PI * 2;
 
-      const distance = 2.2;
+      // Less zoom - more readable distance (was 2.2, now 3.5)
+      const distance = 3.5;
       const direction = worldPos.clone().sub(startPos).normalize();
       const endPos = worldPos.clone().sub(direction.multiplyScalar(distance));
 
       let progress = 0;
       const zoomAnimation = setInterval(() => {
-        progress += 0.008; // Slower, gentler animation (was 0.015)
+        progress += 0.01; // Slightly faster animation
         if (progress >= 1) {
           clearInterval(zoomAnimation);
           progress = 1;
