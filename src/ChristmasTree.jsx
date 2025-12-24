@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 export default function ChristmasTree() {
+  // Detect mobile device
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+  const [isLoading, setIsLoading] = useState(true);
+
   // Old Toons community members
   const [names] = useState([
     'LFChowning',
@@ -187,9 +192,9 @@ export default function ChristmasTree() {
     camera.lookAt(0, 2, 0);
     cameraRef.current = camera;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: !isMobile }); // Disable antialiasing on mobile
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = !isMobile; // Disable shadows on mobile for better performance
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     rendererRef.current = renderer;
     mountRef.current.appendChild(renderer.domElement);
@@ -227,14 +232,16 @@ export default function ChristmasTree() {
 
     // Create realistic organic Christmas Tree
     const createRealisticTree = () => {
-      const treeLevels = 18;
+      // Reduce quality on mobile
+      const treeLevels = isMobile ? 12 : 18; // Fewer layers on mobile
       const totalHeight = 6;
       const baseRadius = 1.9;
       const topRadius = 0.1;
 
       // Central stem/trunk extending through the tree (stops before the star)
       const stemHeight = totalHeight - 0.5; // Shorter to not reach the star
-      const stemGeometry = new THREE.CylinderGeometry(0.08, 0.12, stemHeight, 12);
+      const stemSegments = isMobile ? 6 : 12; // Simpler geometry on mobile
+      const stemGeometry = new THREE.CylinderGeometry(0.08, 0.12, stemHeight, stemSegments);
       const stemMaterial = new THREE.MeshPhongMaterial({
         color: 0x2d1f0f,
         shininess: 3
@@ -252,7 +259,7 @@ export default function ChristmasTree() {
         const radius = baseRadius - (baseRadius - topRadius) * Math.pow(progress, 1.5);
 
         const coneHeight = 0.5;
-        const segments = 32; // Smoother
+        const segments = isMobile ? 16 : 32; // Fewer segments on mobile for better performance
 
         const geometry = new THREE.ConeGeometry(radius, coneHeight, segments);
 
@@ -283,8 +290,8 @@ export default function ChristmasTree() {
         treeGroup.add(cone);
         treeObjectsRef.current.push(cone);
 
-        // Add needle details with gradient colors too
-        const needleCount = Math.floor(16 + level * 1.5);
+        // Add needle details with gradient colors too (skip on mobile for performance)
+        const needleCount = isMobile ? 0 : Math.floor(16 + level * 1.5); // No needles on mobile
         for (let i = 0; i < needleCount; i++) {
           const angle = (i / needleCount) * Math.PI * 2;
           const needleRadius = radius * 0.9;
@@ -309,7 +316,8 @@ export default function ChristmasTree() {
       }
 
       // Realistic tree trunk
-      const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.35, 1.0, 16);
+      const trunkSegments = isMobile ? 8 : 16; // Simpler on mobile
+      const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.35, 1.0, trunkSegments);
       const trunkMaterial = new THREE.MeshPhongMaterial({ 
         color: 0x3d2517,
         shininess: 5
@@ -501,7 +509,7 @@ export default function ChristmasTree() {
 
     // Snow crystals - using sprite textures for snowflake shapes
     const snowflakeGroup = new THREE.Group();
-    const snowCount = 1200; // Tripled from 400
+    const snowCount = isMobile ? 300 : 1200; // Reduce snowflakes on mobile for performance
 
     // Create snowflake texture (6-pointed star/crystal)
     const createSnowflakeTexture = () => {
@@ -580,7 +588,10 @@ export default function ChristmasTree() {
       time += 0.01;
       frameCount++;
 
-      treeGroup.rotation.y += 0.002;
+      // Disable rotation on mobile for better performance
+      if (!isMobile) {
+        treeGroup.rotation.y += 0.002;
+      }
 
       // Update lights every frame (lightweight)
       lightsRef.current.forEach((light, index) => {
@@ -623,6 +634,11 @@ export default function ChristmasTree() {
     };
 
     animate();
+
+    // Set loading to false after a short delay to let the scene render
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
 
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -1022,6 +1038,23 @@ export default function ChristmasTree() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
+      {/* Loading Screen */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-900 to-green-900 flex flex-col items-center justify-center z-50">
+          <div className="text-center">
+            <div className="text-6xl mb-4 animate-bounce">🎄</div>
+            <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4">
+              Loading Christmas Tree...
+            </h2>
+            <div className="flex gap-2 justify-center">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div ref={mountRef} className="w-full h-full" />
       
       <div className="absolute top-0 left-0 right-0 p-2 sm:p-6 text-center">
