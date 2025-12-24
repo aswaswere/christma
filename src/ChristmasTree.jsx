@@ -156,6 +156,10 @@ export default function ChristmasTree() {
     'adrian22572617',
     'aveAnon17',
     'NitzaHernndez',
+    'SkinnyFilter',
+    'tshirtwoman19',
+    'JustThelma_80',
+    'bakasur',
   ]);
 
   const [searchName, setSearchName] = useState('');
