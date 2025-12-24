@@ -15,6 +15,7 @@ export default function ChristmasTree() {
   ]);
   const [searchName, setSearchName] = useState('');
   const [foundName, setFoundName] = useState(null);
+  const [isZoomed, setIsZoomed] = useState(false);
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
@@ -642,6 +643,43 @@ export default function ChristmasTree() {
     });
   }, [names]);
 
+  const resetView = () => {
+    const camera = cameraRef.current;
+    const startPos = camera.position.clone();
+    const defaultPos = new THREE.Vector3(0, 3, 8);
+
+    // Reset all materials
+    treeObjectsRef.current.forEach(obj => {
+      if (obj.material) {
+        obj.material.opacity = 1;
+      }
+    });
+
+    ornamentsRef.current.forEach(ornament => {
+      ornament.material.emissive.setHex(0x000000);
+      ornament.material.opacity = 1;
+    });
+
+    // Animate back to default view
+    let progress = 0;
+    const resetAnimation = setInterval(() => {
+      progress += 0.015;
+      if (progress >= 1) {
+        clearInterval(resetAnimation);
+        progress = 1;
+        setIsZoomed(false);
+        setFoundName(null);
+      }
+
+      const easeProgress = progress < 0.5
+        ? 2 * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+      camera.position.lerpVectors(startPos, defaultPos, easeProgress);
+      camera.lookAt(0, 2, 0);
+    }, 16);
+  };
+
   const handleSearch = () => {
     const found = ornamentsRef.current.find(
       ornament => ornament.name.toLowerCase() === searchName.toLowerCase()
@@ -649,20 +687,21 @@ export default function ChristmasTree() {
 
     if (found) {
       setFoundName(found.name);
-      
+      setIsZoomed(true);
+
       treeObjectsRef.current.forEach(obj => {
         if (obj.material) {
           obj.material.transparent = true;
           obj.material.opacity = 0.25;
         }
       });
-      
+
       ornamentsRef.current.forEach(ornament => {
         ornament.material.emissive.setHex(0x000000);
         ornament.material.transparent = true;
         ornament.material.opacity = 0.3;
       });
-      
+
       found.material.emissive.setHex(0xffaa00);
       found.material.emissiveIntensity = 0.9;
       found.material.opacity = 1;
@@ -708,18 +747,6 @@ export default function ChristmasTree() {
         // Gentle single rotation
         treeGroupRef.current.rotation.y = startRotation + (rotationDiff * easeProgress);
       }, 16);
-
-      setTimeout(() => {
-        setFoundName(null);
-        treeObjectsRef.current.forEach(obj => {
-          if (obj.material) {
-            obj.material.opacity = 1;
-          }
-        });
-        ornamentsRef.current.forEach(ornament => {
-          ornament.material.opacity = 1;
-        });
-      }, 4000);
     } else {
       alert('Name not found on the tree!');
     }
@@ -758,6 +785,18 @@ export default function ChristmasTree() {
       {foundName && (
         <div className="absolute top-20 sm:top-40 md:top-48 left-2 right-2 sm:left-auto sm:right-6 sm:max-w-md bg-green-600 text-white px-3 sm:px-8 py-2 sm:py-4 rounded text-sm sm:text-xl font-bold animate-pulse text-center">
           🎉 Found: {foundName} 🎉
+        </div>
+      )}
+
+      {isZoomed && (
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+          <button
+            onClick={resetView}
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors shadow-lg text-sm sm:text-base flex items-center gap-2"
+          >
+            <span>←</span>
+            <span>Back to Tree</span>
+          </button>
         </div>
       )}
     </div>
