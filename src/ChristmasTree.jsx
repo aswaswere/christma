@@ -160,6 +160,10 @@ export default function ChristmasTree() {
     'tshirtwoman19',
     'JustThelma_80',
     'bakasur',
+    'pranshu',
+    'charu',
+    'utkrishta',
+    'deeksha',
   ]);
 
   const [searchName, setSearchName] = useState('');
