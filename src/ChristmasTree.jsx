@@ -165,19 +165,17 @@ export default function ChristmasTree() {
 
   // Generate FIXED positions for names - use index as seed for consistent placement
   const namePositions = names.map((name, index) => {
-    const yPercent = 22 + (index / names.length) * 54; // 22% to 76% height (tree area)
+    const yPercent = 24 + (index / names.length) * 50; // 24% to 74% height (tree area)
 
     // Calculate tree width at this height (triangle shape from SVG points)
-    // Tree starts narrow at top and widens at bottom
-    // Top is at y=18, bottom at y=80
-    // At y=22: width = ~12 units from center
-    // At y=76: width = ~33 units from center
-    const normalizedY = (yPercent - 22) / 54; // 0 to 1
-    const treeWidthAtY = 12 + normalizedY * 21; // 12 to 33 units from center
+    // Tree: top at y=18 (narrow), bottom at y=80 (wide)
+    // More conservative width calculation to keep names inside
+    const normalizedY = (yPercent - 24) / 50; // 0 to 1
+    const treeWidthAtY = 8 + normalizedY * 24; // 8 to 32 units from center (conservative)
 
     // Use index-based pseudo-random for stable positions
     const pseudoRandom = (Math.sin(index * 12.9898) + 1) / 2; // 0 to 1, stable per index
-    const xPercent = 50 + (pseudoRandom - 0.5) * (treeWidthAtY * 0.85); // 0.85 to keep within tree
+    const xPercent = 50 + (pseudoRandom - 0.5) * (treeWidthAtY * 0.7); // 0.7 to keep well within tree
 
     return {
       name,
@@ -361,7 +359,7 @@ export default function ChristmasTree() {
                 <p
                   className="font-bold text-center whitespace-nowrap transition-all duration-300"
                   style={{
-                    fontSize: isHighlighted ? '16px' : '5px',
+                    fontSize: isHighlighted ? '16px' : '3px',
                     color: isHighlighted ? '#ffd700' : '#d4af37',
                     textShadow: isHighlighted
                       ? '0 0 10px rgba(255,215,0,0.8), 0 2px 4px rgba(0,0,0,0.5), 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'
