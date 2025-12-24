@@ -923,9 +923,9 @@ export default function ChristmasTree() {
         context.shadowOffsetX = 0;
         context.shadowOffsetY = 0;
 
-        // Thick black outline for visibility
+        // Very thick black outline for maximum visibility
         context.strokeStyle = '#000000';
-        context.lineWidth = 12; // Thicker black border
+        context.lineWidth = 24; // Double thickness black border
         context.strokeText(found.name, canvas.width / 2, 128);
 
         // White outline
