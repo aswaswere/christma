@@ -844,22 +844,22 @@ export default function ChristmasTree() {
       setFoundName(found.name);
       setIsZoomed(true);
 
-      // Dim down tree and other ornaments by 50%
+      // Dim down tree and other ornaments significantly
       treeObjectsRef.current.forEach(obj => {
         if (obj.material) {
           obj.material.transparent = true;
-          obj.material.opacity = 0.5; // 50% dimmed
+          obj.material.opacity = 0.3; // Heavily dimmed
         }
       });
 
-      // Dim down all ornaments and their name labels by 50%
+      // Dim down all ornaments and make other names nearly invisible
       ornamentsRef.current.forEach(ornament => {
         ornament.material.emissive.setHex(0x000000);
         ornament.material.transparent = true;
-        ornament.material.opacity = 0.5; // 50% dimmed
-        // Dim the name sprite too
+        ornament.material.opacity = 0.3; // Heavily dimmed
+        // Make other names nearly invisible
         if (ornament.sprite && ornament.sprite.material) {
-          ornament.sprite.material.opacity = 0.1; // Dimmed names
+          ornament.sprite.material.opacity = 0.02; // Almost invisible
         }
       });
 
