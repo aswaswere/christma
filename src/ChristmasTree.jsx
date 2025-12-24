@@ -615,23 +615,24 @@ export default function ChristmasTree() {
       ornament.receiveShadow = true;
       treeGroupRef.current.add(ornament);
 
-      // Name text - no background, clean and archival
+      // Name text - high resolution for mobile clarity
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-      canvas.width = 1024; // Wider canvas to prevent cropping
-      canvas.height = 256;
+      // Much higher resolution for crisp text on all devices
+      canvas.width = 2048;
+      canvas.height = 512;
 
       context.clearRect(0, 0, canvas.width, canvas.height);
 
       // Calculate optimal font size based on name length
-      let fontSize = 65;
+      let fontSize = 130; // Doubled for high-res canvas
       context.font = `Bold ${fontSize}px Georgia, serif`;
       let textWidth = context.measureText(name).width;
 
       // Reduce font size if text is too wide (with padding for borders)
-      const maxWidth = canvas.width - 80; // Leave padding for borders and glow
-      while (textWidth > maxWidth && fontSize > 25) {
-        fontSize -= 2;
+      const maxWidth = canvas.width - 160; // Leave padding for borders and glow
+      while (textWidth > maxWidth && fontSize > 50) {
+        fontSize -= 4;
         context.font = `Bold ${fontSize}px Georgia, serif`;
         textWidth = context.measureText(name).width;
       }
@@ -639,30 +640,32 @@ export default function ChristmasTree() {
       context.textAlign = 'center';
       context.textBaseline = 'middle';
 
-      // Subtle glow
+      // Subtle glow (scaled for high-res)
       context.shadowColor = 'rgba(255, 255, 255, 0.9)';
-      context.shadowBlur = 12;
+      context.shadowBlur = 24;
       context.shadowOffsetX = 0;
       context.shadowOffsetY = 0;
 
-      // Thin white outline
+      // Thin white outline (scaled for high-res)
       context.strokeStyle = '#ffffff';
-      context.lineWidth = 6;
-      context.strokeText(name, canvas.width / 2, 128);
+      context.lineWidth = 12;
+      context.strokeText(name, canvas.width / 2, canvas.height / 2);
 
-      // Very thin dark outline for definition
+      // Very thin dark outline for definition (scaled for high-res)
       context.strokeStyle = '#000000';
-      context.lineWidth = 2;
-      context.strokeText(name, canvas.width / 2, 128);
+      context.lineWidth = 4;
+      context.strokeText(name, canvas.width / 2, canvas.height / 2);
 
       // Gold fill
       context.fillStyle = '#E8C468';
-      context.shadowBlur = 10;
+      context.shadowBlur = 20;
       context.shadowColor = 'rgba(232, 196, 104, 0.6)';
-      context.fillText(name, canvas.width / 2, 128);
+      context.fillText(name, canvas.width / 2, canvas.height / 2);
 
       const texture = new THREE.CanvasTexture(canvas);
-      const spriteMaterial = new THREE.SpriteMaterial({ 
+      texture.minFilter = THREE.LinearFilter; // Better downsampling
+      texture.magFilter = THREE.LinearFilter; // Smoother magnification
+      const spriteMaterial = new THREE.SpriteMaterial({
         map: texture,
         transparent: true,
         depthTest: false,
@@ -846,22 +849,23 @@ export default function ChristmasTree() {
       found.material.depthTest = false;
       found.material.depthWrite = false;
 
-      // Create highlighted name with white box
+      // Create highlighted name with white box - high resolution
       if (found.sprite) {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = 1024;
-        canvas.height = 256;
+        // High resolution for crystal clear text
+        canvas.width = 2048;
+        canvas.height = 512;
 
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        let fontSize = 70;
+        let fontSize = 140; // Scaled for high-res
         context.font = `Bold ${fontSize}px Georgia, serif`;
         let textWidth = context.measureText(found.name).width;
 
-        const maxWidth = canvas.width - 200;
-        while (textWidth > maxWidth && fontSize > 30) {
-          fontSize -= 2;
+        const maxWidth = canvas.width - 400; // More padding for white box
+        while (textWidth > maxWidth && fontSize > 60) {
+          fontSize -= 4;
           context.font = `Bold ${fontSize}px Georgia, serif`;
           textWidth = context.measureText(found.name).width;
         }
@@ -869,31 +873,31 @@ export default function ChristmasTree() {
         context.textAlign = 'center';
         context.textBaseline = 'middle';
 
-        // Draw white background box
-        const padding = 40;
+        // Draw white background box (scaled for high-res)
+        const padding = 80;
         const boxWidth = textWidth + padding * 2;
         const boxHeight = fontSize + padding;
         const boxX = (canvas.width - boxWidth) / 2;
         const boxY = (canvas.height - boxHeight) / 2;
 
         context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        context.shadowBlur = 15;
+        context.shadowBlur = 30;
         context.shadowOffsetX = 0;
-        context.shadowOffsetY = 5;
+        context.shadowOffsetY = 10;
         context.fillStyle = '#FFFFFF';
         context.fillRect(boxX, boxY, boxWidth, boxHeight);
 
         context.shadowColor = 'rgba(0, 0, 0, 0)';
         context.shadowBlur = 0;
 
-        // Very thick black outline
+        // Very thick black outline (scaled for high-res)
         context.strokeStyle = '#000000';
-        context.lineWidth = 24;
+        context.lineWidth = 48;
         context.strokeText(found.name, canvas.width / 2, canvas.height / 2);
 
-        // White outline
+        // White outline (scaled for high-res)
         context.strokeStyle = '#ffffff';
-        context.lineWidth = 6;
+        context.lineWidth = 12;
         context.strokeText(found.name, canvas.width / 2, canvas.height / 2);
 
         // Bright gold fill
@@ -901,6 +905,8 @@ export default function ChristmasTree() {
         context.fillText(found.name, canvas.width / 2, canvas.height / 2);
 
         const texture = new THREE.CanvasTexture(canvas);
+        texture.minFilter = THREE.LinearFilter; // Better quality
+        texture.magFilter = THREE.LinearFilter;
         found.sprite.material.map = texture;
         found.sprite.material.opacity = 1.0;
         found.sprite.material.depthTest = false;
