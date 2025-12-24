@@ -7,7 +7,7 @@ export default function ChristmasTree() {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Old Toons community members
+  // Old Toons community members - showing 20 names
   const [names] = useState([
     'LFChowning',
     'e4tango',
@@ -29,140 +29,6 @@ export default function ChristmasTree() {
     'rootedwlovee',
     'Natesangel4800',
     'charmcas1er',
-    '_001bigboss',
-    'theRoosterBurn',
-    'ehmilien',
-    'pStrawedsprout',
-    'jBenn13JB',
-    'kathyMcRae9',
-    'nSportsline',
-    'tddybearmojo',
-    'shabs1986',
-    'etbfaz',
-    'gsiu_moya',
-    'blitzenDon94929',
-    'salvia762',
-    'anitadottr',
-    'monkeMonkeFunke',
-    'casshernPlays',
-    'ejdias',
-    'suziejp51',
-    'loopyStoopy',
-    'mistyFi60439423',
-    'areuleld',
-    'theLooseMoose_',
-    'martinwaller59',
-    'nappydog',
-    'rrobovski',
-    'dustinpari',
-    'elchiBola',
-    'begleyTheJoker',
-    'merymaywe',
-    'little5mom',
-    'paulDonGipps',
-    'dxLaser_',
-    'deepandey1110',
-    'toy_boy',
-    'frostedFoxShard',
-    'thefriendlyghost',
-    'jacksonLenno_',
-    'devaishwaryaN',
-    'shinsoo',
-    'guiscon8',
-    'cagefreeowl1',
-    'kziggdy',
-    'afaroe02',
-    'al_hyunjin',
-    'zillagodFTN',
-    'cerome73',
-    'helton1568030',
-    'sufferingsucc1',
-    'chris_anthem777',
-    'aSpottedJoan',
-    'galileo908',
-    'cody21594',
-    'latifumarali20',
-    'jdogAmerican',
-    'yGordijn',
-    'myers3371',
-    'francesca4rada',
-    'd_warrior24',
-    'iasraraz1',
-    'snughug1',
-    'jboyko44',
-    'deckofFlora',
-    'darwomingrosi',
-    'pe_scarlette',
-    'anCatDubh8',
-    'luismbullet',
-    'oneUglyMonkey',
-    'arteDeFantasia',
-    'harrisonCora1',
-    'jscherretz',
-    'bobpow60P',
-    'nicholas209',
-    'agentCH',
-    'docGene70',
-    'sportsnstuff13',
-    'platinum9mm',
-    'guuballV99869',
-    'traunikFarm',
-    'aj4xMambru',
-    'drlopez530',
-    'jimfitzwater',
-    'xioniw',
-    'welman92',
-    'boondocks_x',
-    'didericis',
-    'sunflower765277',
-    'rDude64Backup',
-    'kylematthew82',
-    'renager1',
-    'artuscartoons',
-    'azdude',
-    'bill_stewart3',
-    'wwestwi97927',
-    'adzhumashev',
-    'stickytwig',
-    'robert23322',
-    'nickLooker3',
-    'sariphantom',
-    'mark74227190',
-    'jonRum',
-    'salCarpanz28118',
-    'thomasFan3751',
-    'boringquendo184',
-    'blackOfJuly_68',
-    'dougsavageMOB',
-    'joh75570John',
-    'ayahAjam',
-    'mast3rMan',
-    'mmmoeeed',
-    'jmj4USA',
-    'nuts_squir10799',
-    'lase_omope',
-    'twixyburto',
-    'raderMichael',
-    'whatOKnows',
-    'sassyWabbit',
-    'scooterMTRB',
-    'wildRelation',
-    'ladyDi878',
-    'ehpbphill1',
-    'ikaros1428312',
-    'lost_rollito',
-    'leodexart',
-    'joyingeneral',
-    'canuck_chills33',
-    'sugarlovessugar',
-    'ghostofgori9125',
-    'haydropro',
-    'know_one111',
-    'chillbang66',
-    'eddie13106',
-    'adrian22572617',
-    'aveAnon17',
-    'NitzaHernndez',
   ]);
   const [searchName, setSearchName] = useState('');
   const [foundName, setFoundName] = useState(null);
@@ -881,19 +747,80 @@ export default function ChristmasTree() {
   };
 
   const handleSearch = () => {
-    const found = ornamentsRef.current.find(
-      ornament => ornament.name.toLowerCase() === searchName.toLowerCase()
-    );
+    // Check if name exists in the list
+    const nameExists = names.find(name => name.toLowerCase() === searchName.toLowerCase());
 
-    if (found) {
-      setFoundName(found.name);
+    if (nameExists) {
+      setFoundName(nameExists);
       setIsZoomed(true);
+
+      // Generate random position on the tree
+      const randomAngle = Math.random() * Math.PI * 2;
+      const randomHeightProgress = 0.2 + Math.random() * 0.6; // Between 20% and 80% height
+      const randomHeight = randomHeightProgress * 5.5;
+
+      const baseRadius = 1.9;
+      const topRadius = 0.1;
+      const radius = (baseRadius - (baseRadius - topRadius) * Math.pow(randomHeightProgress, 1.5)) * 1.05;
+
+      const x = Math.cos(randomAngle) * radius;
+      const z = Math.sin(randomAngle) * radius;
+
+      // Create or update the ornament at this random position
+      let found = ornamentsRef.current.find(orn => orn.name === nameExists);
+
+      if (found) {
+        // Update position of existing ornament
+        found.mesh.position.set(x, randomHeight, z);
+        found.sprite.position.set(x, randomHeight - 0.32, z);
+        if (found.string) treeGroupRef.current.remove(found.string);
+        if (found.hook) treeGroupRef.current.remove(found.hook);
+        if (found.cap) treeGroupRef.current.remove(found.cap);
+        found.angle = randomAngle;
+        found.position = new THREE.Vector3(x, randomHeight, z);
+
+        // Recreate hanging elements at new position
+        const branchRadius = radius * 0.85;
+        const branchX = Math.cos(randomAngle) * branchRadius;
+        const branchZ = Math.sin(randomAngle) * branchRadius;
+        const branchY = randomHeight + 0.3;
+
+        const hookGeometry = new THREE.SphereGeometry(0.02, 8, 8);
+        const hookMaterial = new THREE.MeshPhongMaterial({
+          color: 0xd4af37,
+          shininess: 60,
+          metalness: 0.7
+        });
+        const hook = new THREE.Mesh(hookGeometry, hookMaterial);
+        hook.position.set(branchX, branchY, branchZ);
+        treeGroupRef.current.add(hook);
+        found.hook = hook;
+
+        const stringCurve = new THREE.QuadraticBezierCurve3(
+          new THREE.Vector3(branchX, branchY, branchZ),
+          new THREE.Vector3((branchX + x) / 2, randomHeight + 0.15, (branchZ + z) / 2),
+          new THREE.Vector3(x, randomHeight + 0.18, z)
+        );
+        const stringPoints = stringCurve.getPoints(20);
+        const stringGeometry = new THREE.BufferGeometry().setFromPoints(stringPoints);
+        const stringMaterial = new THREE.LineBasicMaterial({ color: 0xd4af37, linewidth: 2 });
+        const string = new THREE.Line(stringGeometry, stringMaterial);
+        treeGroupRef.current.add(string);
+        found.string = string;
+
+        const capGeometry = new THREE.CylinderGeometry(0.035, 0.045, 0.06, 12);
+        const capMaterial = new THREE.MeshPhongMaterial({ color: 0xd4af37, shininess: 80, metalness: 0.8 });
+        const cap = new THREE.Mesh(capGeometry, capMaterial);
+        cap.position.set(x, randomHeight + 0.18, z);
+        treeGroupRef.current.add(cap);
+        found.cap = cap;
+      }
 
       // Dim down tree and other ornaments significantly
       treeObjectsRef.current.forEach(obj => {
         if (obj.material) {
           obj.material.transparent = true;
-          obj.material.opacity = 0.3; // Heavily dimmed
+          obj.material.opacity = 0.3;
         }
       });
 
@@ -901,41 +828,38 @@ export default function ChristmasTree() {
       ornamentsRef.current.forEach(ornament => {
         ornament.material.emissive.setHex(0x000000);
         ornament.material.transparent = true;
-        ornament.material.opacity = 0.3; // Heavily dimmed
+        ornament.material.opacity = 0.3;
         ornament.material.depthTest = true;
         ornament.material.depthWrite = true;
-        // Make other names nearly invisible and push to back layers
         if (ornament.sprite && ornament.sprite.material) {
-          ornament.sprite.material.opacity = 0.02; // Almost invisible
-          ornament.sprite.renderOrder = -5; // Push to back layers (4th, 5th layer)
+          ornament.sprite.material.opacity = 0.02;
+          ornament.sprite.renderOrder = -5;
           ornament.sprite.material.depthTest = true;
           ornament.sprite.material.depthWrite = false;
         }
       });
 
       // Highlight the found ornament brightly
-      found.material.emissive.setHex(0xffdd00); // Brighter gold
-      found.material.emissiveIntensity = 1.2; // More intense glow
+      found.material.emissive.setHex(0xffdd00);
+      found.material.emissiveIntensity = 1.2;
       found.material.opacity = 1;
-      found.material.depthTest = false; // Render on top
+      found.material.depthTest = false;
       found.material.depthWrite = false;
 
-      // Create a new highlighted name with thick black border
+      // Create highlighted name with white box
       if (found.sprite) {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
-        canvas.width = 1024; // Wider canvas to prevent cropping
+        canvas.width = 1024;
         canvas.height = 256;
 
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Calculate optimal font size based on name length
         let fontSize = 70;
         context.font = `Bold ${fontSize}px Georgia, serif`;
         let textWidth = context.measureText(found.name).width;
 
-        // Reduce font size if text is too wide (with padding for white box)
-        const maxWidth = canvas.width - 200; // More padding for white box
+        const maxWidth = canvas.width - 200;
         while (textWidth > maxWidth && fontSize > 30) {
           fontSize -= 2;
           context.font = `Bold ${fontSize}px Georgia, serif`;
@@ -952,7 +876,6 @@ export default function ChristmasTree() {
         const boxX = (canvas.width - boxWidth) / 2;
         const boxY = (canvas.height - boxHeight) / 2;
 
-        // White box with shadow
         context.shadowColor = 'rgba(0, 0, 0, 0.5)';
         context.shadowBlur = 15;
         context.shadowOffsetX = 0;
@@ -960,13 +883,12 @@ export default function ChristmasTree() {
         context.fillStyle = '#FFFFFF';
         context.fillRect(boxX, boxY, boxWidth, boxHeight);
 
-        // Reset shadow for text
         context.shadowColor = 'rgba(0, 0, 0, 0)';
         context.shadowBlur = 0;
 
-        // Very thick black outline for maximum visibility
+        // Very thick black outline
         context.strokeStyle = '#000000';
-        context.lineWidth = 24; // Double thickness black border
+        context.lineWidth = 24;
         context.strokeText(found.name, canvas.width / 2, canvas.height / 2);
 
         // White outline
@@ -981,68 +903,53 @@ export default function ChristmasTree() {
         const texture = new THREE.CanvasTexture(canvas);
         found.sprite.material.map = texture;
         found.sprite.material.opacity = 1.0;
-        found.sprite.material.depthTest = false; // Render on top, ignore depth
+        found.sprite.material.depthTest = false;
         found.sprite.material.depthWrite = false;
-        found.sprite.renderOrder = 1000; // Bring to front layer (layer 1)
+        found.sprite.renderOrder = 1000;
         found.sprite.material.needsUpdate = true;
       }
 
-      const worldPos = new THREE.Vector3();
-      found.mesh.getWorldPosition(worldPos);
-
+      // Spin the tree to face the camera
       const camera = cameraRef.current;
       const startPos = camera.position.clone();
-
-      // Calculate rotation to face the ornament directly
       const startRotation = treeGroupRef.current.rotation.y;
 
-      // Calculate shortest rotation path to face the ornament
-      let targetAngle = -found.angle + Math.PI;
-      let rotationDiff = targetAngle - startRotation;
+      // Target rotation: rotate tree so ornament faces front (camera is at z=8)
+      let targetRotation = -randomAngle;
+      let rotationDiff = targetRotation - startRotation;
 
-      // Normalize rotation difference to be between -PI and PI (shortest path)
+      // Normalize to shortest path
       while (rotationDiff > Math.PI) rotationDiff -= Math.PI * 2;
       while (rotationDiff < -Math.PI) rotationDiff += Math.PI * 2;
 
-      // Calculate precise camera position to look directly at ornament
-      const distance = 3.5;
-      // Position camera directly in front of the ornament
-      const ornamentAngle = found.angle;
-      const cameraX = Math.cos(ornamentAngle + Math.PI) * distance + worldPos.x;
-      const cameraZ = Math.sin(ornamentAngle + Math.PI) * distance + worldPos.z;
-      const cameraY = worldPos.y; // Same height as ornament
-      const endPos = new THREE.Vector3(cameraX, cameraY, cameraZ);
+      // Camera zooms to front of tree at ornament height
+      const endPos = new THREE.Vector3(0, randomHeight, 4);
 
       let progress = 0;
       const animateZoom = () => {
-        progress += 0.015; // Smoother increment for mobile
+        progress += 0.015;
 
         if (progress >= 1) {
           progress = 1;
         }
 
-        // Smooth easing function for gentle movement
         const easeProgress = progress < 0.5
           ? 2 * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
-        // Update world position each frame in case of rotation
-        found.mesh.getWorldPosition(worldPos);
-
         camera.position.lerpVectors(startPos, endPos, easeProgress);
-        camera.lookAt(worldPos);
+        camera.lookAt(0, randomHeight, 0);
 
-        // Gentle single rotation
+        // Spin tree to bring ornament to front
         treeGroupRef.current.rotation.y = startRotation + (rotationDiff * easeProgress);
 
-        // Continue animation if not finished
         if (progress < 1) {
           requestAnimationFrame(animateZoom);
         }
       };
       requestAnimationFrame(animateZoom);
     } else {
-      alert('Name not found on the tree!');
+      alert('Name not found in the list!');
     }
     setSearchName('');
   };
