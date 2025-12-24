@@ -915,7 +915,7 @@ export default function ChristmasTree() {
       const camera = cameraRef.current;
       const startPos = camera.position.clone();
 
-      // Calculate rotation to face the ornament - only rotate once gently
+      // Calculate rotation to face the ornament directly
       const startRotation = treeGroupRef.current.rotation.y;
 
       // Calculate shortest rotation path to face the ornament
@@ -926,10 +926,14 @@ export default function ChristmasTree() {
       while (rotationDiff > Math.PI) rotationDiff -= Math.PI * 2;
       while (rotationDiff < -Math.PI) rotationDiff += Math.PI * 2;
 
-      // Less zoom - more readable distance (was 2.2, now 3.5)
+      // Calculate precise camera position to look directly at ornament
       const distance = 3.5;
-      const direction = worldPos.clone().sub(startPos).normalize();
-      const endPos = worldPos.clone().sub(direction.multiplyScalar(distance));
+      // Position camera directly in front of the ornament
+      const ornamentAngle = found.angle;
+      const cameraX = Math.cos(ornamentAngle + Math.PI) * distance + worldPos.x;
+      const cameraZ = Math.sin(ornamentAngle + Math.PI) * distance + worldPos.z;
+      const cameraY = worldPos.y; // Same height as ornament
+      const endPos = new THREE.Vector3(cameraX, cameraY, cameraZ);
 
       let progress = 0;
       const zoomAnimation = setInterval(() => {
@@ -944,7 +948,9 @@ export default function ChristmasTree() {
           ? 2 * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
+        // Update world position each frame in case of rotation
         found.mesh.getWorldPosition(worldPos);
+
         camera.position.lerpVectors(startPos, endPos, easeProgress);
         camera.lookAt(worldPos);
 
